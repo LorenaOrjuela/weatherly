@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object NetworkModule {
 
     @Provides
-    private fun gson(): Gson {
+    fun gson(): Gson {
         return Gson()
     }
 
