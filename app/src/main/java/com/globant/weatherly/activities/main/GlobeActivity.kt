@@ -6,8 +6,10 @@ import androidx.fragment.app.Fragment
 import com.globant.weatherly.R
 import com.globant.weatherly.databinding.ActivityGlobeBinding
 import com.globant.weatherly.fragments.forecast.ForecastFragment
-import com.globant.weatherly.fragments.forecast.HomeFragment
+import com.globant.weatherly.fragments.home.HomeFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class GlobeActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityGlobeBinding

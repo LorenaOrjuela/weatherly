@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.globant.weatherly"
-        minSdk 24
+        minSdk 26
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -26,13 +26,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = '17'
     }
     viewBinding {
+        enabled = true
+    }
+    dataBinding {
         enabled = true
     }
 }
@@ -59,6 +62,10 @@ dependencies {
     //dagger-hilt
     implementation 'com.google.dagger:hilt-android:2.44'
     kapt 'com.google.dagger:hilt-compiler:2.44'
+
+    //groupie
+    implementation 'com.xwray:groupie:2.9.0'
+    implementation 'com.xwray:groupie-databinding:2.9.0'
 }
 
 kapt {

@@ -3,4 +3,7 @@
     <string name="home" translatable="false">Home</string>
 
     <string name="forecast">Pronóstico</string>
+    <string name="loading">Weatherly pensando...</string>
+    <string name="wind">Viento</string>
+    <string name="feels_like">Temperatura ambiente: %s</string>
 </resources>

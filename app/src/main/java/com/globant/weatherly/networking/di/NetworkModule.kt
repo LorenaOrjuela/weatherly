@@ -3,7 +3,7 @@ package com.globant.weatherly.networking.di
 import com.globant.weatherly.networking.interceptors.ApiKeyInterceptor
 import com.globant.weatherly.networking.interceptors.HeadersInterceptor
 import com.globant.weatherly.networking.interceptors.QueryInterceptor
-import com.globant.weatherly.services.forecast.ForecastServices
+import com.globant.weatherly.services.WeatherServices
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -33,8 +33,8 @@ object NetworkModule {
     }
 
     @Provides
-    fun forecast(retrofit: Retrofit): ForecastServices {
-        return retrofit.create(ForecastServices::class.java)
+    fun forecast(retrofit: Retrofit): WeatherServices {
+        return retrofit.create(WeatherServices::class.java)
     }
 
     private fun httpClient(): OkHttpClient {

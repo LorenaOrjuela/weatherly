@@ -4,4 +4,12 @@
     <style name="Theme.App.Splash" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
+
+    <style name="Text">
+        <item name="android:textSize">@dimen/font_normal</item>
+    </style>
+
+    <style name="TextBold" parent="Text">
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>
