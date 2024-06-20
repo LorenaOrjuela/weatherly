@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <style name="Theme.App.Splash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
+    <style name="Text">
+        <item name="android:textSize">@dimen/font_normal</item>
+    </style>
+
+    <style name="TextBold" parent="Text">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextSmallBold" parent="TextBold">
+        <item name="android:textSize">@dimen/font_small</item>
+    </style>
+</resources>
