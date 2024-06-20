@@ -9,7 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.globant.weatherly.R
 import com.globant.weatherly.databinding.FragmentHomeBinding
+import com.globant.weatherly.extensions.degreesToCardinal
 import com.globant.weatherly.models.WeatherResponse
 import com.globant.weatherly.uimodels.forecast.ForecastUiModel
 import com.globant.weatherly.uimodels.weather.WeatherUiModel
@@ -26,7 +28,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment: Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
-    private lateinit var binding: FragmentHomeBinding
+    private var nullableBinding: FragmentHomeBinding? = null
+    private val binding get() = nullableBinding!!
     private val recyclerAdapter by lazy { GroupAdapter<GroupieViewHolder>() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +44,7 @@ class HomeFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        nullableBinding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -78,16 +81,22 @@ class HomeFragment: Fragment() {
     private fun handleWeatherUpdate(uiModel: WeatherUiModel) {
         when (uiModel) {
             is WeatherUiModel.OnWeatherLoad -> { onWeatherLoad(uiModel.currentWeather) }
-            is WeatherUiModel.OnWeatherLoadError -> {  }
+            is WeatherUiModel.OnWeatherLoadError -> {
+                showLoading(false)
+                showError(true)
+            }
         }
     }
 
     private fun handleForecastUpdate(uiModel: ForecastUiModel) {
         when (uiModel) {
             is ForecastUiModel.OnForecastLoad -> { onForecastLoad(uiModel.weathers, uiModel.currentWeather) }
-            is ForecastUiModel.OnForecastLoadError -> {  }
-            is ForecastUiModel.OnForeCastFiveDaysLoad -> {  }
-            is ForecastUiModel.OnForecastFiveDaysLoadError -> {  }
+            is ForecastUiModel.OnForecastLoadError -> {
+                showLoading(false)
+                showError(true)
+            }
+            is ForecastUiModel.OnForeCastFiveDaysLoad -> { Unit }
+            is ForecastUiModel.OnForecastFiveDaysLoadError -> { Unit }
         }
     }
 
@@ -100,7 +109,8 @@ class HomeFragment: Fragment() {
 
         val adapter = GroupAdapter<GroupieViewHolder>()
         currentWeather.let {
-            adapter.add(ItemWeatherHeader(it.cityName ?: "City name", it.wind.deg.toString(), it.wind.speed.toString(), it.main.feelsLike.toString(), "${it.main.tempMax.toInt()}º" + "/" + "${it.main.tempMin.toInt()}º"))
+            val feelsLike = getString(R.string.feels_like, it.main.feelsLike.toString())
+            adapter.add(ItemWeatherHeader(it.cityName ?: "City name", it.wind.deg.degreesToCardinal(), it.wind.speed.toString(), feelsLike, "${it.main.tempMax.toInt()}º" + "/" + "${it.main.tempMin.toInt()}º"))
         }
         weathers.let {
             adapter.addAll(it.map { weather ->
@@ -110,7 +120,7 @@ class HomeFragment: Fragment() {
                     icon = 1
                 )
             })
-            //showLoading(false)
+            showLoading(false)
         }
         binding.apply {
             recyclerForecast.adapter = adapter
@@ -119,8 +129,14 @@ class HomeFragment: Fragment() {
     }
 
     private fun showLoading(show: Boolean) {
-        binding.root.apply {
+        binding.layoutLoading.root.apply {
            visibility = if (show) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun showError(show: Boolean) {
+        binding.layoutError.root.apply {
+            visibility = if (show) View.VISIBLE else View.GONE
         }
     }
 }

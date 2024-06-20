@@ -18,3 +18,15 @@ fun List<Int>.getAverageAngle(): Double {
     if (averageDegrees < 0) averageDegrees += 360.0
     return averageDegrees
 }
+
+fun Double.degreesToCardinal(): String {
+    val directions = arrayOf("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO")
+    val index = ((this / 22.5) + 0.5).toInt()
+    return directions[index % 16]
+}
+
+fun Int.degreesToCardinal(): String {
+    val directions = arrayOf("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO")
+    val index = ((this / 22.5) + 0.5).toInt()
+    return directions[index % 16]
+}

@@ -12,6 +12,7 @@ import com.globant.weatherly.uimodels.weather.WeatherUiModel
 import com.globant.weatherly.utils.LocationUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,13 +36,18 @@ class HomeViewModel @Inject constructor (
 
     fun getWeather(context: Context) {
         viewModelScope.launch {
-            val location = LocationUtils.getLocation(context)
+            try {
+                showLoading.postValue(true)
 
-            showLoading.postValue(true)
-            val response = weatherController.getWeather(location.latitude.toString(), location.longitude.toString())
-            if (response != null) {
-                weatherUiModel.postValue(WeatherUiModel.OnWeatherLoad(response))
-            } else {
+                val location = LocationUtils.getLocation(context)
+                val response = weatherController.getWeather(location.latitude.toString(), location.longitude.toString())
+
+                if (response != null) {
+                    weatherUiModel.postValue(WeatherUiModel.OnWeatherLoad(response))
+                } else {
+                    weatherUiModel.postValue(WeatherUiModel.OnWeatherLoadError)
+                }
+            } catch (e: Exception) {
                 weatherUiModel.postValue(WeatherUiModel.OnWeatherLoadError)
             }
         }
@@ -49,16 +55,18 @@ class HomeViewModel @Inject constructor (
 
     fun getTodayForecast(currentWeather: WeatherResponse, context: Context) {
         viewModelScope.launch {
-            val location = LocationUtils.getLocation(context)
-
-            showLoading.postValue(true)
-            val response = weatherController.getTodayForecast(location.latitude.toString(), location.longitude.toString())
-            response?.let {
-                if (response.isNotEmpty()) {
-                    forecastUiModel.postValue(ForecastUiModel.OnForecastLoad(response, currentWeather))
-                } else {
-                    forecastUiModel.postValue(ForecastUiModel.OnForecastLoadError)
+            try {
+                val location = LocationUtils.getLocation(context)
+                val response = weatherController.getTodayForecast(location.latitude.toString(), location.longitude.toString())
+                response?.let {
+                    if (response.isNotEmpty()) {
+                        forecastUiModel.postValue(ForecastUiModel.OnForecastLoad(response, currentWeather))
+                    } else {
+                        forecastUiModel.postValue(ForecastUiModel.OnForecastLoadError)
+                    }
                 }
+            } catch (e: Exception) {
+                forecastUiModel.postValue(ForecastUiModel.OnForecastLoadError)
             }
         }
     }

@@ -2,6 +2,7 @@ package com.globant.weatherly.services.implementation
 
 import android.content.Context
 import android.util.Log
+import com.globant.weatherly.extensions.degreesToCardinal
 import com.globant.weatherly.extensions.getAverageAngle
 import com.globant.weatherly.models.ForecastDay
 import com.globant.weatherly.models.ForecastResponse
@@ -50,8 +51,9 @@ class WeatherController @Inject constructor(
              val maxTemp = "${entryDate.value.maxOfOrNull { it.main.tempMax }?.toInt()}º"
              val minTemp = "${entryDate.value.minOfOrNull { it.main.tempMin }?.toInt()}º"
              val speed = "${entryDate.value.map { it.wind.speed }.average().toInt()}"
-             val direction = "${entryDate.value.map { it.wind.deg }.getAverageAngle()}"
-             ForecastDay(date, maxTemp, minTemp, speed, direction, 1, "")
+             val direction = entryDate.value.map { it.wind.deg }.getAverageAngle().degreesToCardinal()
+             val description = entryDate.value.first().weather.first().description
+             ForecastDay(date, maxTemp, minTemp, speed, direction, 1, description)
         }?.values?.toList()
     }
 }

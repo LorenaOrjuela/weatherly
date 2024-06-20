@@ -10,6 +10,7 @@ import com.globant.weatherly.uimodels.forecast.ForecastUiModel
 import com.globant.weatherly.utils.LocationUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,15 +30,20 @@ class ForecastViewModel @Inject constructor (
 
     fun getFiveDaysForecast(context: Context) {
         viewModelScope.launch {
-            val location = LocationUtils.getLocation(context)
-            showLoading.postValue(true)
-            val response = weatherController.getFiveDaysForecast(context, location.latitude.toString(), location.longitude.toString())
-            response?.let {
-                if (response.isNotEmpty()) {
-                    forecastUiModel.postValue(ForecastUiModel.OnForeCastFiveDaysLoad(response))
-                } else {
-                    forecastUiModel.postValue(ForecastUiModel.OnForecastFiveDaysLoadError)
+            try {
+                showLoading.postValue(true)
+
+                val location = LocationUtils.getLocation(context)
+                val response = weatherController.getFiveDaysForecast(context, location.latitude.toString(), location.longitude.toString())
+                response?.let {
+                    if (response.isNotEmpty()) {
+                        forecastUiModel.postValue(ForecastUiModel.OnForeCastFiveDaysLoad(response))
+                    } else {
+                        forecastUiModel.postValue(ForecastUiModel.OnForecastFiveDaysLoadError)
+                    }
                 }
+            } catch (e: Exception) {
+                forecastUiModel.postValue(ForecastUiModel.OnForecastFiveDaysLoadError)
             }
         }
     }

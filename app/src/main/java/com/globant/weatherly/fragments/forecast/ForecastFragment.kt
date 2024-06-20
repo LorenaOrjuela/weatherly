@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.globant.weatherly.R
 import com.globant.weatherly.databinding.FragmentForecastBinding
 import com.globant.weatherly.databinding.FragmentHomeBinding
 import com.globant.weatherly.databinding.ItemForecastDayBinding
@@ -31,7 +32,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class ForecastFragment: Fragment() {
 
     private val viewModel: ForecastViewModel by viewModels()
-    private lateinit var binding: FragmentForecastBinding
+    private var nullableBinding: FragmentForecastBinding? = null
+    private val binding get() = nullableBinding!!
     private val recyclerAdapter by lazy { GroupAdapter<GroupieViewHolder>() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +48,7 @@ class ForecastFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentForecastBinding.inflate(inflater, container, false)
+        nullableBinding = FragmentForecastBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -82,9 +84,12 @@ class ForecastFragment: Fragment() {
     private fun handleForecastUpdate(uiModel: ForecastUiModel) {
         when (uiModel) {
             is ForecastUiModel.OnForeCastFiveDaysLoad -> { onForecastLoad(uiModel.forecasts) }
-            is ForecastUiModel.OnForecastFiveDaysLoadError -> {  }
-            is ForecastUiModel.OnForecastLoad -> {  }
-            is ForecastUiModel.OnForecastLoadError-> {  }
+            is ForecastUiModel.OnForecastFiveDaysLoadError -> {
+                showLoading(false)
+                showError(true)
+            }
+            is ForecastUiModel.OnForecastLoad -> { Unit }
+            is ForecastUiModel.OnForecastLoadError-> { Unit }
         }
     }
 
@@ -95,20 +100,27 @@ class ForecastFragment: Fragment() {
             forecasts.map { forecast ->
                 ItemsForecastDay(
                     date = forecast.date,
-                    hiTemp = forecast.maxTemp,
-                    lowTemp = forecast.minTemp,
-                    speed = forecast.speed,
+                    hiTemp = getString(R.string.high_temp, forecast.maxTemp),
+                    lowTemp = getString(R.string.low_temp, forecast.minTemp),
+                    speed = "${forecast.speed} mph",
                     direction = forecast.direction,
                     description = forecast.description,
                     icon = 1
                 )
             }
         )
+        showLoading(false)
         binding.swipeDay.isRefreshing = false
     }
 
     private fun showLoading(show: Boolean) {
-        binding.root.apply {
+        binding.layoutLoading.root.apply {
+            visibility = if (show) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun showError(show: Boolean) {
+        binding.layoutError.root.apply {
             visibility = if (show) View.VISIBLE else View.GONE
         }
     }

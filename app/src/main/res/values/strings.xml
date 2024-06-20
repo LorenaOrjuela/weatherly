@@ -4,6 +4,7 @@
 
     <string name="forecast">Pronóstico</string>
     <string name="loading">Weatherly pensando...</string>
+    <string name="error">Weatherly error =(</string>
     <string name="wind">Viento</string>
     <string name="wind_speed">Velocidad del viento</string>
     <string name="feels_like">Temperatura ambiente: %s</string>
