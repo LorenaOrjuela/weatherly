@@ -2,5 +2,8 @@
     <string name="forecast">Forecast</string>
     <string name="loading">Weatherly thinking...</string>
     <string name="wind">Wind</string>
+    <string name="wind_speed">Wind speed</string>
     <string name="feels_like">Feels like: %s</string>
+    <string name="high_temp">Hi Temp: %s</string>
+    <string name="low_temp">Low Temp: %s</string>
 </resources>

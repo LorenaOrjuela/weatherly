@@ -5,5 +5,8 @@
     <string name="forecast">Pronóstico</string>
     <string name="loading">Weatherly pensando...</string>
     <string name="wind">Viento</string>
+    <string name="wind_speed">Velocidad del viento</string>
     <string name="feels_like">Temperatura ambiente: %s</string>
+    <string name="high_temp">Temperatura alta: %s</string>
+    <string name="low_temp">Temperatura baja: %s</string>
 </resources>

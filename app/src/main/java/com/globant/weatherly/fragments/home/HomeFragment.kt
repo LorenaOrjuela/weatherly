@@ -33,7 +33,7 @@ class HomeFragment: Fragment() {
         super.onCreate(savedInstanceState)
 
         subscribeToViewModel()
-        viewModel.getWeather()
+        viewModel.getWeather(requireContext())
     }
 
     override fun onCreateView(
@@ -48,6 +48,7 @@ class HomeFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
+        setListeners()
     }
 
     private fun subscribeToViewModel() {
@@ -65,6 +66,15 @@ class HomeFragment: Fragment() {
         }
     }
 
+    private fun setListeners() {
+        binding.apply {
+            swipeHour.setOnRefreshListener {
+                swipeHour.isRefreshing = true
+                viewModel.getWeather(requireContext())
+            }
+        }
+    }
+
     private fun handleWeatherUpdate(uiModel: WeatherUiModel) {
         when (uiModel) {
             is WeatherUiModel.OnWeatherLoad -> { onWeatherLoad(uiModel.currentWeather) }
@@ -76,11 +86,13 @@ class HomeFragment: Fragment() {
         when (uiModel) {
             is ForecastUiModel.OnForecastLoad -> { onForecastLoad(uiModel.weathers, uiModel.currentWeather) }
             is ForecastUiModel.OnForecastLoadError -> {  }
+            is ForecastUiModel.OnForeCastFiveDaysLoad -> {  }
+            is ForecastUiModel.OnForecastFiveDaysLoadError -> {  }
         }
     }
 
     private fun onWeatherLoad(currentWeather: WeatherResponse) {
-        viewModel.getTodayForecast(currentWeather)
+        viewModel.getTodayForecast(currentWeather, requireContext())
     }
 
     private fun onForecastLoad(weathers: List<WeatherResponse>, currentWeather: WeatherResponse) {
@@ -100,7 +112,10 @@ class HomeFragment: Fragment() {
             })
             //showLoading(false)
         }
-        binding.recyclerForecast.adapter = adapter
+        binding.apply {
+            recyclerForecast.adapter = adapter
+            swipeHour.isRefreshing = false
+        }
     }
 
     private fun showLoading(show: Boolean) {

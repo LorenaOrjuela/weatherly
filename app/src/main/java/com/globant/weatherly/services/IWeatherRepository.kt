@@ -5,7 +5,7 @@ import com.globant.weatherly.models.WeatherResponse
 
 interface IWeatherRepository {
 
-    suspend fun getWeather(): WeatherResponse?
+    suspend fun getWeather(lat: String,lon: String): WeatherResponse?
 
-    suspend fun getForecast(): ForecastResponse?
+    suspend fun getForecast(lat: String,lon: String): ForecastResponse?
 }
