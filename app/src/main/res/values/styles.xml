@@ -12,4 +12,8 @@
     <style name="TextBold" parent="Text">
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="TextSmallBold" parent="TextBold">
+        <item name="android:textSize">@dimen/font_small</item>
+    </style>
 </resources>

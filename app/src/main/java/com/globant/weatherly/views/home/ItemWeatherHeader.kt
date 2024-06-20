@@ -18,7 +18,7 @@ class ItemWeatherHeader(
         viewBinding.apply {
             textViewCity.text = city
             textViewDirection.text = direction
-            textViewSpeed.text = speed
+            textViewSpeed.text = "$speed mph"
             textViewFeelsLike.text = feelsLike
             textViewMinMax.text = maxMinTemperature
         }

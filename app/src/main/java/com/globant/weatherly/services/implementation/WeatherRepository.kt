@@ -12,8 +12,8 @@ class WeatherRepository @Inject constructor(
     private val weatherServices: WeatherServices
 ): IWeatherRepository {
 
-    override suspend fun getWeather(): WeatherResponse? = withContext(Dispatchers.IO) {
-        val response = weatherServices.getWeather()
+    override suspend fun getWeather(lat: String, lon: String): WeatherResponse? = withContext(Dispatchers.IO) {
+        val response = weatherServices.getWeather(lat,lon)
         return@withContext if (response.isSuccessful) {
             response.body()
         } else {
@@ -21,8 +21,8 @@ class WeatherRepository @Inject constructor(
         }
     }
 
-    override suspend fun getForecast(): ForecastResponse? = withContext(Dispatchers.IO) {
-        val response = weatherServices.getForecast()
+    override suspend fun getForecast(lat: String, lon: String): ForecastResponse? = withContext(Dispatchers.IO) {
+        val response = weatherServices.getForecast(lat,lon)
         return@withContext if (response.isSuccessful) {
             response.body()
         } else {
