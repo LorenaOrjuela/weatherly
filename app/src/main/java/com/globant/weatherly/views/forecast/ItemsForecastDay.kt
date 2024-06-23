@@ -2,6 +2,7 @@ package com.globant.weatherly.views.forecast
 
 import com.globant.weatherly.R
 import com.globant.weatherly.databinding.ItemForecastDayBinding
+import com.globant.weatherly.utils.ImageUtils
 import com.xwray.groupie.databinding.BindableItem
 
 class ItemsForecastDay (
@@ -11,7 +12,7 @@ class ItemsForecastDay (
     private val speed: String,
     private val direction: String,
     private val description: String,
-    private val icon: Int): BindableItem<ItemForecastDayBinding>() {
+    private val iconCode: String): BindableItem<ItemForecastDayBinding>() {
 
     override fun getLayout() = R.layout.item_forecast_day
 
@@ -24,6 +25,7 @@ class ItemsForecastDay (
             textViewSpeed.text = speed
             textViewDirection.text = direction
             textViewDescription.text = description
+            ImageUtils.loadImageResized(imageViewWeather, "https://openweathermap.org/img/wn/${iconCode}@2x.png")
         }
     }
 }

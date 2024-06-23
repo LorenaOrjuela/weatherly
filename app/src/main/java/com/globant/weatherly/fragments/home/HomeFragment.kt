@@ -16,6 +16,7 @@ import com.globant.weatherly.models.WeatherResponse
 import com.globant.weatherly.uimodels.forecast.ForecastUiModel
 import com.globant.weatherly.uimodels.weather.WeatherUiModel
 import com.globant.weatherly.utils.DATE_TIME
+import com.globant.weatherly.utils.ImageUtils
 import com.globant.weatherly.utils.getHourAmPm
 import com.globant.weatherly.viewmodels.home.HomeViewModel
 import com.globant.weatherly.views.home.ItemTemperatureHour
@@ -117,7 +118,7 @@ class HomeFragment: Fragment() {
                 ItemTemperatureHour(
                     hour = weather.date?.let { date -> getHourAmPm(date, DATE_TIME) } ?: "1:00PM",
                     temperature = "${weather.main.temp.toInt()}º",
-                    icon = 1
+                    iconCode = weather.weather.first().iconCode
                 )
             })
             showLoading(false)

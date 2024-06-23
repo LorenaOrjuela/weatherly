@@ -11,19 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.globant.weatherly.R
 import com.globant.weatherly.databinding.FragmentForecastBinding
-import com.globant.weatherly.databinding.FragmentHomeBinding
-import com.globant.weatherly.databinding.ItemForecastDayBinding
 import com.globant.weatherly.models.ForecastDay
-import com.globant.weatherly.models.WeatherResponse
 import com.globant.weatherly.uimodels.forecast.ForecastUiModel
-import com.globant.weatherly.uimodels.weather.WeatherUiModel
-import com.globant.weatherly.utils.DATE_TIME
-import com.globant.weatherly.utils.getHourAmPm
 import com.globant.weatherly.viewmodels.forecast.ForecastViewModel
-import com.globant.weatherly.viewmodels.home.HomeViewModel
 import com.globant.weatherly.views.forecast.ItemsForecastDay
-import com.globant.weatherly.views.home.ItemTemperatureHour
-import com.globant.weatherly.views.home.ItemWeatherHeader
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import dagger.hilt.android.AndroidEntryPoint
@@ -105,7 +96,7 @@ class ForecastFragment: Fragment() {
                     speed = "${forecast.speed} mph",
                     direction = forecast.direction,
                     description = forecast.description,
-                    icon = 1
+                    iconCode = forecast.iconCode
                 )
             }
         )
