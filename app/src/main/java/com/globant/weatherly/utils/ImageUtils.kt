@@ -13,5 +13,4 @@ object ImageUtils {
             .load(uri).apply(RequestOptions.overrideOf(100, 100))
             .into(imageView)
     }
-
 }
