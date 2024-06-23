@@ -28,6 +28,5 @@ data class WindProperties(
 
 data class Weather(
     @SerializedName("description") val description: String,
-    @SerializedName("icon") val deg: String
+    @SerializedName("icon") val iconCode: String
 )
-

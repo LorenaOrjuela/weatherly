@@ -53,7 +53,8 @@ class WeatherController @Inject constructor(
              val speed = "${entryDate.value.map { it.wind.speed }.average().toInt()}"
              val direction = entryDate.value.map { it.wind.deg }.getAverageAngle().degreesToCardinal()
              val description = entryDate.value.first().weather.first().description
-             ForecastDay(date, maxTemp, minTemp, speed, direction, 1, description)
+             val iconCode = entryDate.value.first().weather.first().iconCode
+             ForecastDay(date, maxTemp, minTemp, speed, direction, iconCode, description)
         }?.values?.toList()
     }
 }
