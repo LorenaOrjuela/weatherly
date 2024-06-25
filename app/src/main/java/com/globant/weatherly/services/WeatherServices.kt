@@ -9,14 +9,8 @@ import retrofit2.http.Query
 interface WeatherServices {
 
     @GET("data/2.5/weather")
-    suspend fun getWeather(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String
-    ): Response<WeatherResponse>
+    suspend fun getWeather(): Response<WeatherResponse>
 
     @GET("data/2.5/forecast")
-    suspend fun getForecast(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String
-    ): Response<ForecastResponse>
+    suspend fun getForecast(): Response<ForecastResponse>
 }
