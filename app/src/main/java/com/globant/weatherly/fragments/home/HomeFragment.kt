@@ -7,16 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.globant.weatherly.R
 import com.globant.weatherly.databinding.FragmentHomeBinding
 import com.globant.weatherly.extensions.degreesToCardinal
 import com.globant.weatherly.models.WeatherResponse
-import com.globant.weatherly.uimodels.forecast.ForecastUiModel
-import com.globant.weatherly.uimodels.weather.WeatherUiModel
 import com.globant.weatherly.utils.DATE_TIME
-import com.globant.weatherly.utils.ImageUtils
 import com.globant.weatherly.utils.getHourAmPm
 import com.globant.weatherly.viewmodels.home.HomeViewModel
 import com.globant.weatherly.views.home.ItemTemperatureHour
@@ -37,10 +35,9 @@ class HomeFragment: Fragment() {
         super.onCreate(savedInstanceState)
 
         subscribeToViewModel()
-        viewModel.getWeather(requireContext())
     }
 
-    override fun onCreateView(
+    override fun onCreateView (
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,11 +50,10 @@ class HomeFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViews()
         setListeners()
+        handleWeather()
     }
 
     private fun subscribeToViewModel() {
-        viewModel.getWeatherUiModels().observe( this@HomeFragment, Observer { handleWeatherUpdate(it) } )
-        viewModel.getForecastUiModels().observe( this@HomeFragment, Observer { handleForecastUpdate(it) } )
         viewModel.getShowLoading().observe(this@HomeFragment, Observer { showLoading(it) })
     }
 
@@ -74,38 +70,42 @@ class HomeFragment: Fragment() {
         binding.apply {
             swipeHour.setOnRefreshListener {
                 swipeHour.isRefreshing = true
-                viewModel.getWeather(requireContext())
+                handleWeather()
             }
         }
     }
 
-    private fun handleWeatherUpdate(uiModel: WeatherUiModel) {
-        when (uiModel) {
-            is WeatherUiModel.OnWeatherLoad -> { onWeatherLoad(uiModel.currentWeather) }
-            is WeatherUiModel.OnWeatherLoadError -> {
-                showLoading(false)
-                showError(true)
+    private fun handleWeather() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.getCombinedWeatherFlow().collect { (weatherResult, forecastResult) ->
+                when {
+                    (weatherResult.isSuccess && forecastResult.isSuccess) -> {
+                        forecastResult.getOrNull()?.let { forecast ->
+                            weatherResult.getOrNull()?.let { weather ->
+                                onWeatherForecastLoad(forecast, weather)
+                            }
+                        }
+                    }
+                    (weatherResult.isFailure && forecastResult.isSuccess) -> {
+                        forecastResult.getOrNull()?.let { forecast ->
+                            onWeatherError(forecast)
+                        }
+                    }
+                    (weatherResult.isSuccess && forecastResult.isFailure) -> {
+                        weatherResult.getOrNull()?.let { weather ->
+                            onForecastError(weather)
+                        }
+                    }
+                    (weatherResult.isFailure && forecastResult.isFailure) -> {
+                        showLoading(false)
+                        showError(true)
+                    }
+                }
             }
         }
     }
 
-    private fun handleForecastUpdate(uiModel: ForecastUiModel) {
-        when (uiModel) {
-            is ForecastUiModel.OnForecastLoad -> { onForecastLoad(uiModel.weathers, uiModel.currentWeather) }
-            is ForecastUiModel.OnForecastLoadError -> {
-                showLoading(false)
-                showError(true)
-            }
-            is ForecastUiModel.OnForeCastFiveDaysLoad -> { Unit }
-            is ForecastUiModel.OnForecastFiveDaysLoadError -> { Unit }
-        }
-    }
-
-    private fun onWeatherLoad(currentWeather: WeatherResponse) {
-        viewModel.getTodayForecast(currentWeather, requireContext())
-    }
-
-    private fun onForecastLoad(weathers: List<WeatherResponse>, currentWeather: WeatherResponse) {
+    private fun onWeatherForecastLoad(forecasts: List<WeatherResponse>, currentWeather: WeatherResponse) {
         recyclerAdapter.clear()
 
         val adapter = GroupAdapter<GroupieViewHolder>()
@@ -113,7 +113,7 @@ class HomeFragment: Fragment() {
             val feelsLike = getString(R.string.feels_like, it.main.feelsLike.toString())
             adapter.add(ItemWeatherHeader(it.cityName ?: "City name", it.wind.deg.degreesToCardinal(), it.wind.speed.toString(), feelsLike, "${it.main.tempMax.toInt()}º" + "/" + "${it.main.tempMin.toInt()}º"))
         }
-        weathers.let {
+        forecasts.let {
             adapter.addAll(it.map { weather ->
                 ItemTemperatureHour(
                     hour = weather.date?.let { date -> getHourAmPm(date, DATE_TIME) } ?: "1:00PM",
@@ -127,6 +127,33 @@ class HomeFragment: Fragment() {
             recyclerForecast.adapter = adapter
             swipeHour.isRefreshing = false
         }
+    }
+
+    private fun onWeatherError(weathers: List<WeatherResponse>) {
+        recyclerAdapter.clear()
+
+        weathers.let {
+            recyclerAdapter.addAll(it.map { weather ->
+                ItemTemperatureHour(
+                    hour = weather.date?.let { date -> getHourAmPm(date, DATE_TIME) } ?: "1:00PM",
+                    temperature = "${weather.main.temp.toInt()}º",
+                    iconCode = weather.weather.first().iconCode
+                )
+            })
+        }
+        showLoading(false)
+        binding.swipeHour.isRefreshing = false
+    }
+
+    private fun onForecastError(currentWeather: WeatherResponse) {
+        recyclerAdapter.clear()
+
+        currentWeather.let {
+            val feelsLike = getString(R.string.feels_like, it.main.feelsLike.toString())
+            recyclerAdapter.add(ItemWeatherHeader(it.cityName ?: "City name", it.wind.deg.degreesToCardinal(), it.wind.speed.toString(), feelsLike, "${it.main.tempMax.toInt()}º" + "/" + "${it.main.tempMin.toInt()}º"))
+        }
+        showLoading(false)
+        binding.swipeHour.isRefreshing = false
     }
 
     private fun showLoading(show: Boolean) {

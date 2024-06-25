@@ -79,8 +79,6 @@ class ForecastFragment: Fragment() {
                 showLoading(false)
                 showError(true)
             }
-            is ForecastUiModel.OnForecastLoad -> { Unit }
-            is ForecastUiModel.OnForecastLoadError-> { Unit }
         }
     }
 
