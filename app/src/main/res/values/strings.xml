@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name" translatable="false">weatherly</string>
     <string name="home" translatable="false">Home</string>
+    <string name="speed" translatable="false">%s mph</string>
 
     <string name="forecast">Pronóstico</string>
     <string name="loading">Weatherly pensando...</string>
     <string name="error">Weatherly error =(</string>
+    <string name="empty">Wearherly no tiene pronosticos por el momento.</string>
     <string name="wind">Viento</string>
     <string name="wind_speed">Velocidad del viento</string>
     <string name="feels_like">Temperatura ambiente: %s</string>

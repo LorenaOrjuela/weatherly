@@ -3,6 +3,7 @@ package com.globant.weatherly.viewmodels.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.globant.weatherly.exceptions.EmptyException
 import com.globant.weatherly.models.WeatherResponse
 import com.globant.weatherly.services.IWeatherController
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,7 @@ class HomeViewModel @Inject constructor (
             if (response != null) {
                 emit(Result.success(response))
             } else {
-                emit(Result.success(null))
+                emit(Result.failure(EmptyException("")))
             }
         } catch (e: Exception) {
             emit(Result.failure(e))
@@ -32,11 +33,12 @@ class HomeViewModel @Inject constructor (
 
     private val todayForecastFlow: Flow<Result<List<WeatherResponse>?>> = flow {
         try {
+            showLoading.postValue(true)
             val response = weatherController.getTodayForecast()
             if (response != null) {
                 emit(Result.success(response))
             } else {
-                emit(Result.success(null))
+                emit(Result.failure(EmptyException("")))
             }
         } catch (e: Exception) {
             emit(Result.failure(e))
