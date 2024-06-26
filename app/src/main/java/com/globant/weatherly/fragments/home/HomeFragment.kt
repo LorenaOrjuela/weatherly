@@ -1,6 +1,7 @@
 package com.globant.weatherly.fragments.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,23 +13,24 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.globant.weatherly.R
 import com.globant.weatherly.databinding.FragmentHomeBinding
-import com.globant.weatherly.extensions.degreesToCardinal
+import com.globant.weatherly.exceptions.EmptyException
 import com.globant.weatherly.models.WeatherResponse
-import com.globant.weatherly.utils.DATE_TIME
-import com.globant.weatherly.utils.getHourAmPm
 import com.globant.weatherly.viewmodels.home.HomeViewModel
 import com.globant.weatherly.views.home.ItemTemperatureHour
 import com.globant.weatherly.views.home.ItemWeatherHeader
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Exception
 
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
+
     private var nullableBinding: FragmentHomeBinding? = null
     private val binding get() = nullableBinding!!
+
     private val recyclerAdapter by lazy { GroupAdapter<GroupieViewHolder>() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,27 +80,28 @@ class HomeFragment: Fragment() {
     private fun handleWeather() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.getCombinedWeatherFlow().collect { (weatherResult, forecastResult) ->
-                when {
-                    (weatherResult.isSuccess && forecastResult.isSuccess) -> {
+                if (weatherResult.isSuccess) {
+                    if(forecastResult.isSuccess) {
                         forecastResult.getOrNull()?.let { forecast ->
                             weatherResult.getOrNull()?.let { weather ->
                                 onWeatherForecastLoad(forecast, weather)
                             }
                         }
-                    }
-                    (weatherResult.isFailure && forecastResult.isSuccess) -> {
-                        forecastResult.getOrNull()?.let { forecast ->
-                            onWeatherError(forecast)
-                        }
-                    }
-                    (weatherResult.isSuccess && forecastResult.isFailure) -> {
+                    } else {
                         weatherResult.getOrNull()?.let { weather ->
-                            onForecastError(weather)
+                            onWeatherLoad(weather)
                         }
                     }
-                    (weatherResult.isFailure && forecastResult.isFailure) -> {
-                        showLoading(false)
-                        showError(true)
+                } else {
+                    if(forecastResult.isSuccess) {
+                        forecastResult.getOrNull()?.let { forecast ->
+                            onForecastLoad(forecast)
+                        }
+                    } else {
+                        when (forecastResult.exceptionOrNull()) {
+                            is Exception -> showError(true)
+                            is EmptyException -> showEmpty(true)
+                        }
                     }
                 }
             }
@@ -109,51 +112,55 @@ class HomeFragment: Fragment() {
         recyclerAdapter.clear()
 
         val adapter = GroupAdapter<GroupieViewHolder>()
-        currentWeather.let {
-            val feelsLike = getString(R.string.feels_like, it.main.feelsLike.toString())
-            adapter.add(ItemWeatherHeader(it.cityName ?: "City name", it.wind.deg.degreesToCardinal(), it.wind.speed.toString(), feelsLike, "${it.main.tempMax.toInt()}º" + "/" + "${it.main.tempMin.toInt()}º"))
-        }
-        forecasts.let {
-            adapter.addAll(it.map { weather ->
-                ItemTemperatureHour(
-                    hour = weather.date?.let { date -> getHourAmPm(date, DATE_TIME) } ?: "1:00PM",
-                    temperature = "${weather.main.temp.toInt()}º",
-                    iconCode = weather.weather.first().iconCode
-                )
-            })
-            showLoading(false)
-        }
+
+        adapter.add(getWeatherItem(currentWeather))
+        adapter.addAll(getForecastItems(forecasts))
+
+        showLoading(false)
         binding.apply {
             recyclerForecast.adapter = adapter
             swipeHour.isRefreshing = false
         }
     }
 
-    private fun onWeatherError(weathers: List<WeatherResponse>) {
+    private fun onForecastLoad(weathers: List<WeatherResponse>) {
         recyclerAdapter.clear()
+        recyclerAdapter.addAll(getForecastItems(weathers))
 
-        weathers.let {
-            recyclerAdapter.addAll(it.map { weather ->
-                ItemTemperatureHour(
-                    hour = weather.date?.let { date -> getHourAmPm(date, DATE_TIME) } ?: "1:00PM",
-                    temperature = "${weather.main.temp.toInt()}º",
-                    iconCode = weather.weather.first().iconCode
-                )
-            })
-        }
         showLoading(false)
         binding.swipeHour.isRefreshing = false
     }
 
-    private fun onForecastError(currentWeather: WeatherResponse) {
+    private fun onWeatherLoad(currentWeather: WeatherResponse) {
         recyclerAdapter.clear()
+        recyclerAdapter.add(getWeatherItem(currentWeather))
 
-        currentWeather.let {
-            val feelsLike = getString(R.string.feels_like, it.main.feelsLike.toString())
-            recyclerAdapter.add(ItemWeatherHeader(it.cityName ?: "City name", it.wind.deg.degreesToCardinal(), it.wind.speed.toString(), feelsLike, "${it.main.tempMax.toInt()}º" + "/" + "${it.main.tempMin.toInt()}º"))
-        }
         showLoading(false)
         binding.swipeHour.isRefreshing = false
+    }
+
+    private fun getWeatherItem(currentWeather: WeatherResponse): ItemWeatherHeader {
+        return currentWeather.let {
+            ItemWeatherHeader(
+                requireContext(),
+                it.cityName,
+                it.wind.deg,
+                it.wind.speed,
+                it.main.feelsLike,
+                it.main.tempMax,
+                it.main.tempMin
+            )
+        }
+    }
+
+    private fun  getForecastItems(forecasts: List<WeatherResponse>): List<ItemTemperatureHour> {
+        return forecasts.map { weather ->
+            ItemTemperatureHour(
+                weather.date,
+                weather.main.temp,
+                weather.weather.first().iconCode
+            )
+        }
     }
 
     private fun showLoading(show: Boolean) {
@@ -165,6 +172,13 @@ class HomeFragment: Fragment() {
     private fun showError(show: Boolean) {
         binding.layoutError.root.apply {
             visibility = if (show) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun showEmpty(show: Boolean) {
+        binding.layoutError.apply {
+            root.visibility = if (show) View.VISIBLE else View.GONE
+            tvMessage.text = getString(R.string.empty)
         }
     }
 }
