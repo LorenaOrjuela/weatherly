@@ -44,7 +44,7 @@ class WeatherController @Inject constructor(
                 getDate(it, DATE_TIME)
             }
         }?.mapValues { entryDate ->
-            //TODO create weather extensions (WeatherExtensions.kt) to reduce de code here
+            //TODO create weather extensions (WeatherExtensions.kt) to reduce code here
              val date = "${entryDate.value.first().date}"
              val maxTemp = "${entryDate.value.maxOfOrNull { it.main.tempMax }?.toInt()}º"
              val minTemp = "${entryDate.value.minOfOrNull { it.main.tempMin }?.toInt()}º"

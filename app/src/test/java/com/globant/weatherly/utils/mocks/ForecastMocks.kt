@@ -99,13 +99,14 @@ object ForecastMocks {
         ))
     }
 
-    /*fun getForecastDays(): List<ForecastDay> {
+    fun getForecastDays(): List<ForecastDay> {
         return listOf(
-            ForecastDay( , , , , , , ),
-            ForecastDay( , , , , , , ),
-            ForecastDay( , , , , , , ),
-            ForecastDay( , , , , , , ),
-            ForecastDay( , , , , , , )
+            ForecastDay("2024-06-28 15:00:00", "62º", "56º", "2", "O", "04d", "broken clouds"),
+            ForecastDay("2024-06-29 00:00:00", "63º", "53º", "2", "", "10n", "light rain"),
+            ForecastDay("2024-06-30 00:00:00", "69º", "50º", "2", "SE", "10n", "light rain"),
+            ForecastDay("2024-07-01 00:00:00", "65º", "52º", "2", "SE", "10n", "light rain"),
+            ForecastDay("2024-07-02 00:00:00", "58º", "51º", "2", "SE", "10n", "light rain"),
+            ForecastDay("2024-07-03 00:00:00", "52º", "51º", "3", "ESE", "04n", "overcast clouds")
         )
-    }*/
+    }
 }
