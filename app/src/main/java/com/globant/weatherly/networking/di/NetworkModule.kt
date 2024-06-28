@@ -1,5 +1,6 @@
 package com.globant.weatherly.networking.di
 
+import android.content.Context
 import com.globant.weatherly.networking.interceptors.ApiKeyInterceptor
 import com.globant.weatherly.networking.interceptors.HeadersInterceptor
 import com.globant.weatherly.networking.interceptors.QueryInterceptor
@@ -24,9 +25,10 @@ object NetworkModule {
     }
 
     @Provides
-    fun retrofit(gson: Gson): Retrofit {
+    fun retrofit(gson: Gson, appContext: Context): Retrofit {
         return Retrofit.Builder()
-            .client(httpClient())
+            .client(httpClient(appContext))
+            //TODO: An uls file was created, please use to store this url http://api.openweathermap.org, is better to implements flavors.
             .baseUrl("http://api.openweathermap.org")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
@@ -37,8 +39,8 @@ object NetworkModule {
         return retrofit.create(WeatherServices::class.java)
     }
 
-    private fun httpClient(): OkHttpClient {
-        val interceptors = getHttpInterceptors()
+    private fun httpClient(appContext: Context): OkHttpClient {
+        val interceptors = getHttpInterceptors(appContext)
         val builder = OkHttpClient.Builder()
 
         interceptors.forEach { builder.addInterceptor(it) }
@@ -46,11 +48,12 @@ object NetworkModule {
         return builder.build()
     }
 
-    private fun getHttpInterceptors(): List<Interceptor> {
+    private fun getHttpInterceptors(appContext: Context): List<Interceptor> {
+
         return listOfNotNull(
             ApiKeyInterceptor(),
             HeadersInterceptor(),
-            QueryInterceptor()
+            QueryInterceptor(appContext)
         )
     }
 }

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.globant.weatherly.services.IWeatherController
 import com.globant.weatherly.uimodels.forecast.ForecastUiModel
-import com.globant.weatherly.utils.LocationUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -33,8 +32,7 @@ class ForecastViewModel @Inject constructor (
             try {
                 showLoading.postValue(true)
 
-                val location = LocationUtils.getLocation(context)
-                val response = weatherController.getFiveDaysForecast(context, location.latitude.toString(), location.longitude.toString())
+                val response = weatherController.getFiveDaysForecast()
                 response?.let {
                     if (response.isNotEmpty()) {
                         forecastUiModel.postValue(ForecastUiModel.OnForeCastFiveDaysLoad(response))

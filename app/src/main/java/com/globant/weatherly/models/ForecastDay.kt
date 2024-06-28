@@ -6,6 +6,6 @@ data class ForecastDay (
     val minTemp: String,
     val speed: String,
     val direction: String,
-    val icon: Int,
+    val iconCode: String,
     val description: String
 )

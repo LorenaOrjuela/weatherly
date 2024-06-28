@@ -2,6 +2,7 @@
     <string name="forecast">Forecast</string>
     <string name="loading">Weatherly thinking...</string>
     <string name="error">Weatherly sad error =(</string>
+    <string name="empty">Wearherly doesn\'t have pronostics.</string>
     <string name="wind">Wind</string>
     <string name="wind_speed">Wind speed</string>
     <string name="feels_like">Feels like: %s</string>

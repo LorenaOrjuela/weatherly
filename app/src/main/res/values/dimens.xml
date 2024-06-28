@@ -6,8 +6,11 @@
 
     <!--spacing-->
     <dimen name="spacing_empty">0dp</dimen>
+    <dimen name="spacing_xxx_small">5dp</dimen>
+    <dimen name="spacing_xx_small">10dp</dimen>
     <dimen name="spacing_x_small">15dp</dimen>
     <dimen name="spacing_small">18dp</dimen>
+    <dimen name="spacing_medium">50dp</dimen>
 
     <!--text-->
     <dimen name="font_small">12sp</dimen>
