@@ -14,6 +14,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -27,6 +28,7 @@ object NetworkModule {
     fun retrofit(gson: Gson, appContext: Context): Retrofit {
         return Retrofit.Builder()
             .client(httpClient(appContext))
+            //TODO: An uls file was created, please use to store this url http://api.openweathermap.org, is better to implements flavors.
             .baseUrl("http://api.openweathermap.org")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

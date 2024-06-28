@@ -70,6 +70,7 @@ fun ForecastDayItem(forecastDay: ForecastDay) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RemoteImage(
+                //TODO: Handle https://openweathermap.org/img/wn/${iconCode}@2x.png by implementing a centralized way.
                 "https://openweathermap.org/img/wn/${forecastDay.iconCode}@2x.png",
                         modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium))
             )

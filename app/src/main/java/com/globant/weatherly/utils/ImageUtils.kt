@@ -10,6 +10,7 @@ object ImageUtils {
 
         Glide
             .with(imageView.context)
+            //TODO could provide width and height dinamycly depending device dimensions.
             .load(uri).apply(RequestOptions.overrideOf(100, 100))
             .into(imageView)
     }

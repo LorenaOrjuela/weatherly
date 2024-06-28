@@ -19,6 +19,7 @@ class ItemTemperatureHour(
         viewBinding.apply {
             textViewHour.text = date?.let { date -> getHourAmPm(date, DATE_TIME) } ?: "1:00PM"
             textViewTemperature.text = "${temperature.toInt()}º"
+            //TODO: Handle https://openweathermap.org/img/wn/${iconCode}@2x.png by implementing a centralized way.
             ImageUtils.loadImageResized(imageViewWeather, "https://openweathermap.org/img/wn/${iconCode}@2x.png")
         }
     }
