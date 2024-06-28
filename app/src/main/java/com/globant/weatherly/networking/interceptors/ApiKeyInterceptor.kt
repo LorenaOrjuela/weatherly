@@ -8,6 +8,7 @@ class ApiKeyInterceptor(): Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
+        //TODO store it suing DataStore Preferences
         val apiKey = "caad787b9089c6114d7a0ac1e50a8b10"
         val request = chain.request()
         val url = request.url
