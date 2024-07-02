@@ -4,7 +4,7 @@ import com.globant.weatherly.models.ForecastDay
 
 sealed class ForecastUiModel {
 
-    class OnForecastLoading(val loading: Boolean) : ForecastUiModel()
+    object OnForecastLoading : ForecastUiModel()
     class OnForeCastFiveDaysLoad(val forecasts: List<ForecastDay>): ForecastUiModel()
     object OnForecastFiveDaysLoadError : ForecastUiModel()
 }

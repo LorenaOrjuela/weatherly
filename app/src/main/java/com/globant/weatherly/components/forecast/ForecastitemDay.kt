@@ -50,7 +50,7 @@ fun ForecastDayItem(forecastDay: ForecastDay) {
         ) {
             Text(
                 text = forecastDay.date,
-                style = MaterialTheme.typography.subtitle1
+                style = MaterialTheme.typography.body2
             )
             Text(
                 text = stringResource(R.string.wind_speed),

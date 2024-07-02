@@ -1,14 +1,14 @@
 package com.globant.weatherly.fragments.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.globant.weatherly.R
@@ -21,7 +21,7 @@ import com.globant.weatherly.views.home.ItemWeatherHeader
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.Exception
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment: Fragment() {
@@ -43,7 +43,7 @@ class HomeFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         nullableBinding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -56,7 +56,7 @@ class HomeFragment: Fragment() {
     }
 
     private fun subscribeToViewModel() {
-        viewModel.getShowLoading().observe(this@HomeFragment, Observer { showLoading(it) })
+        viewModel.getShowLoading().observe(this@HomeFragment) { showLoading(it) }
     }
 
     private fun initViews() {
@@ -78,29 +78,31 @@ class HomeFragment: Fragment() {
     }
 
     private fun handleWeather() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.getCombinedWeatherFlow().collect { (weatherResult, forecastResult) ->
-                if (weatherResult.isSuccess) {
-                    if(forecastResult.isSuccess) {
-                        forecastResult.getOrNull()?.let { forecast ->
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getCombinedWeatherFlow().collect { (weatherResult, forecastResult) ->
+                    if (weatherResult.isSuccess) {
+                        if(forecastResult.isSuccess) {
+                            forecastResult.getOrNull()?.let { forecast ->
+                                weatherResult.getOrNull()?.let { weather ->
+                                    onWeatherForecastLoad(forecast, weather)
+                                }
+                            }
+                        } else {
                             weatherResult.getOrNull()?.let { weather ->
-                                onWeatherForecastLoad(forecast, weather)
+                                onWeatherLoad(weather)
                             }
                         }
                     } else {
-                        weatherResult.getOrNull()?.let { weather ->
-                            onWeatherLoad(weather)
-                        }
-                    }
-                } else {
-                    if(forecastResult.isSuccess) {
-                        forecastResult.getOrNull()?.let { forecast ->
-                            onForecastLoad(forecast)
-                        }
-                    } else {
-                        when (forecastResult.exceptionOrNull()) {
-                            is Exception -> showError(true)
-                            is EmptyException -> showEmpty(true)
+                        if(forecastResult.isSuccess) {
+                            forecastResult.getOrNull()?.let { forecast ->
+                                onForecastLoad(forecast)
+                            }
+                        } else {
+                            when (forecastResult.exceptionOrNull()) {
+                                is Exception -> showError(true)
+                                is EmptyException -> showEmpty(true)
+                            }
                         }
                     }
                 }

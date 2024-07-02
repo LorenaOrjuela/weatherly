@@ -1,6 +1,5 @@
 package com.globant.weatherly.viewmodels.forecast
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,18 +26,16 @@ class ForecastViewModel @Inject constructor (
         return showLoading
     }
 
-    fun getFiveDaysForecast(context: Context) {
+    fun getFiveDaysForecast() {
         viewModelScope.launch {
             try {
-                showLoading.postValue(true)
+                //showLoading.postValue(true)
 
                 val response = weatherController.getFiveDaysForecast()
-                response?.let {
-                    if (response.isNotEmpty()) {
-                        forecastUiModel.postValue(ForecastUiModel.OnForeCastFiveDaysLoad(response))
-                    } else {
-                        forecastUiModel.postValue(ForecastUiModel.OnForecastFiveDaysLoadError)
-                    }
+                if (!response.isNullOrEmpty()) {
+                    forecastUiModel.postValue(ForecastUiModel.OnForeCastFiveDaysLoad(response))
+                } else {
+                    forecastUiModel.postValue(ForecastUiModel.OnForecastFiveDaysLoadError)
                 }
             } catch (e: Exception) {
                 forecastUiModel.postValue(ForecastUiModel.OnForecastFiveDaysLoadError)

@@ -4,7 +4,7 @@ import com.globant.weatherly.networking.HttpConstants.APY_KEY
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class ApiKeyInterceptor(): Interceptor {
+class ApiKeyInterceptor: Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
