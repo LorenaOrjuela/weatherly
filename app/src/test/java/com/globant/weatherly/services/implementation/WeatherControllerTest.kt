@@ -54,5 +54,34 @@ class WeatherControllerTest {
         } ?: assert(false)
     }
 
-    //TODO test cases related to getFiveDaysForecast
+    @Test
+    fun `getTodayForecast correctly filters forecasts when none match`() {
+        val forecastResponse = ForecastMocks.getForecastWhenNoForecastIsToday()
+        val expectedSize = forecastResponse.forecasts.filter { forecast ->
+            forecast.date == getDateTime(now(), DATE_TIME)
+        }.size
+
+        coEvery { weatherController.getForecast() } returns forecastResponse
+
+        val forecasts = runBlocking { weatherController.getTodayForecast() }
+
+        assertNotNull(forecasts)
+        forecasts?.let {
+            assertEquals(expectedSize, it.size)
+        } ?: assert(false)
+    }
+
+    @Test
+    fun `getFiveDaysForecast correctly when forecasts are coherent`() {
+        val forecastResponse = ForecastMocks.getMockFiveDaysThreeHoursResponse()
+
+        coEvery { weatherController.getForecast() } returns forecastResponse
+
+        val forecasts = runBlocking { weatherController.getFiveDaysForecast() }
+
+        assertNotNull(forecasts)
+        forecasts?.let {
+            assertEquals(6, it.size)
+        } ?: assert(false)
+    }
 }

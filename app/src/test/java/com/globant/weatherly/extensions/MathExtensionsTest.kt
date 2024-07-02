@@ -10,7 +10,7 @@ class MathExtensionsTest {
     fun `get average angle in when the list contains coherent info`() {
 
         val coherentAngles: List<Int> = listOf(20, -720, 35, -67, 720, 800)
-        val angleAverage = coherentAngles.getAverageAngle()
+        val angleAverage = coherentAngles.getAngleAvg()
 
         assertEquals(12.770848172356189, angleAverage)
     }
@@ -19,7 +19,7 @@ class MathExtensionsTest {
     fun `get average angle in Double when the list contains coherent info`() {
 
         val coherentAngles: List<Int> = listOf(20, -720, 35, -67, 720, 800)
-        val angleAverage = coherentAngles.getAverageAngle()
+        val angleAverage = coherentAngles.getAngleAvg()
 
         assertTrue("angleAverage average should  be in double",angleAverage is Double)
     }
@@ -28,7 +28,7 @@ class MathExtensionsTest {
     fun `get average angle between 0 and 360 when the list contains coherent info`() {
 
         val coherentAngles: List<Int> = listOf(20, -720, 35, -67, 720, 800)
-        val angleAverage = coherentAngles.getAverageAngle()
+        val angleAverage = coherentAngles.getAngleAvg()
 
         assertTrue("angleAverage should between the limits",angleAverage in 0.0..360.0)
     }
