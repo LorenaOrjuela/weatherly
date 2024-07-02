@@ -1,46 +1,67 @@
 package com.globant.weatherly.viewmodels
 
-import com.globant.weatherly.services.IWeatherController
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.globant.weatherly.models.ForecastDay
+import com.globant.weatherly.services.implementation.WeatherController
+import com.globant.weatherly.services.implementation.WeatherRepository
 import com.globant.weatherly.uimodels.forecast.ForecastUiModel
-import com.globant.weatherly.utils.mocks.ForecastMocks.getForecastDays
+import com.globant.weatherly.utils.mocks.ForecastMocks.getForecastDaysSuccessful
+import com.globant.weatherly.utils.mocks.ForecastMocks.getMockFiveDaysThreeHoursResponse
 import com.globant.weatherly.viewmodels.forecast.ForecastViewModel
+import com.jraska.livedata.test
 import io.mockk.coEvery
 import io.mockk.mockk
-import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class ForecastViewModelTest {
 
-    //TODO: Review why the test fails wit the error
-    //@get:Rule
-    //var hiltRule = HiltAndroidRule(this)
-
-    //@get:Rule
-    //var instantExecutorRule = InstantTaskExecutorRule()
-
+    private lateinit var weatherController: WeatherController
     private lateinit var viewModel: ForecastViewModel
-    private val weatherController = mockk<IWeatherController>()
+    private val weatherRepository: WeatherRepository = mockk<WeatherRepository>(relaxed = true)
+
+    @get:Rule
+    var rule = InstantTaskExecutorRule()
+
 
     @Before
     fun setup() {
-        //hiltRule.inject()
+        Dispatchers.setMain(Dispatchers.Unconfined)
+        weatherController = WeatherController(weatherRepository)
         viewModel = ForecastViewModel(weatherController)
     }
 
     @Test
-    fun `get five days forecast, when response is not empty, updates LiveData correctly1`() = runBlocking {
+    fun `get days forecast, when response is successful, updates LiveData correctly and response is coherent`() = runTest {
+        val weatherResponseDays = getMockFiveDaysThreeHoursResponse()
+        val observer = viewModel.getForecastUiModels().test()
+        val forecastExpected = getForecastDaysSuccessful()
 
-        val forecastDays = getForecastDays()
+        coEvery { weatherController.getForecast() } returns weatherResponseDays
 
-        coEvery { weatherController.getFiveDaysForecast() } returns forecastDays
+        viewModel.getFiveDaysForecast()
 
-        viewModel.getFiveDaysForecast(mockk(relaxed = true))
+        observer.assertValue {
+            it is ForecastUiModel.OnForeCastFiveDaysLoad && it.forecasts == forecastExpected
+        }
+    }
 
-        assertTrue(viewModel.getForecastUiModels().value is ForecastUiModel.OnForeCastFiveDaysLoad)
-        assert(true)
+    @Test
+    fun `get days forecast, when response is null, updates LiveData error`() = runTest {
+        val observer = viewModel.getForecastUiModels().test()
+
+        coEvery { weatherController.getForecast() } returns null
+
+        viewModel.getFiveDaysForecast()
+
+        observer.assertValue {
+            it is ForecastUiModel.OnForecastFiveDaysLoadError
+        }
     }
 }

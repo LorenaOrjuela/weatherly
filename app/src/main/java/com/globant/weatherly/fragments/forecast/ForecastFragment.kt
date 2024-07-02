@@ -27,7 +27,7 @@ class ForecastFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.getFiveDaysForecast(requireContext())
+        viewModel.getFiveDaysForecast()
     }
 
     override fun onCreateView(
@@ -41,11 +41,13 @@ class ForecastFragment: Fragment() {
 
     @Composable
     fun ForecastScreen(viewModel: ForecastViewModel) {
+        val loading = viewModel.getShowLoading().observeAsState().value ?: false
+        if (loading) LoadingScreen()
+
         val uiModel = viewModel.getForecastUiModels().observeAsState().value
         when (uiModel) {
             is ForecastUiModel.OnForeCastFiveDaysLoad -> ForecastList(uiModel.forecasts)
             is ForecastUiModel.OnForecastFiveDaysLoadError -> ErrorScreen()
-            is ForecastUiModel.OnForecastLoading -> LoadingScreen()
             else -> { Unit }
         }
     }

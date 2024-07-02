@@ -1,6 +1,5 @@
 package com.globant.weatherly.utils
 
-import android.util.Log
 import com.globant.weatherly.Constants.EMPTY
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -60,27 +59,26 @@ fun getHourAmPm(dateTimeString: String, pattern: String): String {
 }
 
 fun getDateLetters(dateString: String, pattern: String): String {
-    val dateFormatted = try {
 
-        val formatter = DateTimeFormatter.ofPattern(pattern)
-        val date = LocalDateTime.parse(dateString, formatter)
+    val formatter = DateTimeFormatter.ofPattern(pattern)
+    val date = LocalDateTime.parse(dateString, formatter)
 
-        val dateLocal = date.toLocalDate()
-        val formatterDate = DateTimeFormatter.ofPattern(DAY_MONTH_DAY)
-        dateLocal.format(formatterDate)} catch (e: Exception) { e.message }
+    val dayOfWeek = date.dayOfWeek.value
+    val month = date.month.value
+    val year = date.year
 
-    return dateFormatted.toString()
+    return "${DayLetters.fromIndex(dayOfWeek).day}, " + "${MonthLetters.fromIndex(month).month} " + year.toString().takeLast(2)
+
 }
 
-//TODO: use the next enum to show the day in the forecast Item y forecast screen
 enum class DayLetters(val index: Int, val day: String) {
-    MONDAY(0, "Monday"),
-    TUESDAY(1, "Tuesday"),
-    WEDNESDAY(2, "Wednesday"),
-    THURSDAY(3, "Thursday"),
-    FRIDAY(4, "Friday"),
-    SATURDAY(5, "Saturday"),
-    SUNDAY(6, "Sunday");
+    MONDAY(1, "Monday"),
+    TUESDAY(2, "Tuesday"),
+    WEDNESDAY(3, "Wednesday"),
+    THURSDAY(4, "Thursday"),
+    FRIDAY(5, "Friday"),
+    SATURDAY(6, "Saturday"),
+    SUNDAY(7, "Sunday");
 
     companion object {
         fun fromIndex(index: Int): DayLetters {
@@ -90,7 +88,6 @@ enum class DayLetters(val index: Int, val day: String) {
     }
 }
 
-//TODO: use the next enum to show the day in the forecast Item y forecast screen
 enum class MonthLetters(val index: Int, val month: String) {
     JANUARY(1, "January"),
     FEBRUARY(2, "February"),
@@ -111,12 +108,4 @@ enum class MonthLetters(val index: Int, val month: String) {
                 ?: throw IllegalArgumentException("Please review if there is an invalid day index: $index")
         }
     }
-}
-
-//TODO: use the next enum to show the day in the forecast Item y forecast screen
-fun getYearShort(dateTime: String, pattern: String): String {
-    val formatter = DateTimeFormatter.ofPattern(pattern)
-    val parsedDate = LocalDateTime.parse(dateTime, formatter)
-
-    return parsedDate.year.toString().takeLast(2)
 }

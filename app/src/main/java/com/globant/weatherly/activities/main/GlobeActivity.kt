@@ -45,7 +45,7 @@ class GlobeActivity: BaseActivity() {
     }
 
     private fun setViews() {
-        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home -> { replaceFragment(HomeFragment()) }
                 R.id.forecast -> { replaceFragment(ForecastFragment()) }

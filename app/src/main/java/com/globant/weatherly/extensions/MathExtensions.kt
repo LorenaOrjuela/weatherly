@@ -4,7 +4,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun List<Int>.getAverageAngle(): Double {
+fun List<Int>.getAngleAvg(): Double {
     var sumSin = 0.00
     var sumCos = 0.00
 
