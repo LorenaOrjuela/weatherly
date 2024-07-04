@@ -13,7 +13,7 @@ class DateUtilsTest {
         val pattern = "yyyy-MM-dd HH:mm:ss"
         val expected = "2024-06-20 12:00:00"
 
-        val dateTime = getDateTime(localDateTime, pattern)
+        val dateTime = getDatePattern(localDateTime, pattern)
 
         assertEquals(expected, dateTime)
     }
@@ -24,7 +24,7 @@ class DateUtilsTest {
         val pattern = "yyyy-MM-dd HH:mm:sss"
         val expected = "Invalid pattern"
 
-        val dateTime = getDateTime(localDateTime, pattern)
+        val dateTime = getDatePattern(localDateTime, pattern)
 
         assertEquals(expected, dateTime)
     }
@@ -35,7 +35,7 @@ class DateUtilsTest {
         val pattern = EMPTY
         val expected = EMPTY
 
-        val dateTime = getDateTime(localDateTime, pattern)
+        val dateTime = getDatePattern(localDateTime, pattern)
 
         assertEquals(expected, dateTime)
     }
@@ -80,7 +80,7 @@ class DateUtilsTest {
 
         val hourAmPm = getHourAmPm(dateTime, formatter)
 
-        assertEquals("02:31 AM" , hourAmPm)
+        assertEquals("02:31 AM", hourAmPm)
     }
 
     @Test
@@ -91,7 +91,7 @@ class DateUtilsTest {
 
         val hourAmPm = getHourAmPm(dateTime, formatter)
 
-        assertEquals(expected , hourAmPm)
+        assertEquals(expected, hourAmPm)
     }
 
     @Test
@@ -101,7 +101,27 @@ class DateUtilsTest {
 
         val hourAmPm = getHourAmPm(dateTime, formatter)
 
-        assertEquals(EMPTY , hourAmPm)
+        assertEquals(EMPTY, hourAmPm)
     }
 
+    @Test
+    fun `getDateLetters correctly when inputs are coherent`() {
+        val dateTime = "2024-06-20 02:31:20"
+        val expected = "Thursday, June 20"
+
+        val dateLetters = getDateLetters(dateTime, DATE_TIME)
+
+        assertEquals(expected, dateLetters)
+    }
+
+    @Test
+    fun `getDateLetters correctly when inputs are not coherent`() {
+        val formatter = "yyyy-MM-dd HH:mm:sss"
+        val dateTime = "2024-06-20 02:31:200"
+        val expected = "Inputs are not coherent"
+
+        val dateLetters = getDateLetters(dateTime, formatter)
+
+        assertEquals(expected, dateLetters)
+    }
 }

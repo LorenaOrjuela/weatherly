@@ -24,7 +24,7 @@ fun LoadingScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(dimensionResource(id = R.dimen.spacing_x_small)), // Assuming you have some padding, adjust as necessary
+            .padding(dimensionResource(id = R.dimen.spacing_x_small)),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -1,11 +1,16 @@
 package com.globant.weatherly.services.implementation
 
+import com.globant.weatherly.TestConstants.CURRENT_DATE_TEST
+import com.globant.weatherly.TestConstants.DATE_UTILS_CLASS
+import com.globant.weatherly.utils.DATE
 import com.globant.weatherly.utils.DATE_TIME
-import com.globant.weatherly.utils.getDateTime
+import com.globant.weatherly.utils.getDatePattern
 import com.globant.weatherly.utils.mocks.ForecastMocks
 import com.globant.weatherly.utils.now
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.runBlocking
@@ -20,6 +25,7 @@ class WeatherControllerTest {
     @Before
     fun setup() {
         weatherController = WeatherController(weatherRepository)
+        mockkStatic(DATE_UTILS_CLASS)
     }
 
     @Test
@@ -41,7 +47,7 @@ class WeatherControllerTest {
     fun `getTodayForecast filters forecasts correctly when 2 forecasts are today`() {
         val forecastResponse = ForecastMocks.getMockWhenTwoForecastAreToday()
         val expectedSize = forecastResponse.forecasts.filter { forecast ->
-            forecast.date == getDateTime(now(), DATE_TIME)
+            forecast.date == getDatePattern(now(), DATE_TIME)
         }.size
 
         coEvery { weatherController.getForecast() } returns forecastResponse
@@ -58,7 +64,7 @@ class WeatherControllerTest {
     fun `getTodayForecast correctly filters forecasts when none match`() {
         val forecastResponse = ForecastMocks.getForecastWhenNoForecastIsToday()
         val expectedSize = forecastResponse.forecasts.filter { forecast ->
-            forecast.date == getDateTime(now(), DATE_TIME)
+            forecast.date == getDatePattern(now(), DATE_TIME)
         }.size
 
         coEvery { weatherController.getForecast() } returns forecastResponse
@@ -78,10 +84,11 @@ class WeatherControllerTest {
         coEvery { weatherController.getForecast() } returns forecastResponse
 
         val forecasts = runBlocking { weatherController.getFiveDaysForecast() }
+        every { getDatePattern(any(), DATE) } returns CURRENT_DATE_TEST
 
         assertNotNull(forecasts)
         forecasts?.let {
-            assertEquals(6, it.size)
+            assertEquals(5, it.size)
         } ?: assert(false)
     }
 }
