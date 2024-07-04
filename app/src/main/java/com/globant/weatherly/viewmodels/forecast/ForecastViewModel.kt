@@ -12,24 +12,19 @@ import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-class ForecastViewModel @Inject constructor (
+class ForecastViewModel @Inject constructor(
     private val weatherController: IWeatherController
-): ViewModel() {
+) : ViewModel() {
 
     private val forecastUiModel = MutableLiveData<ForecastUiModel>()
     fun getForecastUiModels(): LiveData<ForecastUiModel> {
         return forecastUiModel
     }
 
-    private val showLoading = MutableLiveData<Boolean>()
-    fun getShowLoading(): LiveData<Boolean> {
-        return showLoading
-    }
-
     fun getFiveDaysForecast() {
         viewModelScope.launch {
             try {
-                //showLoading.postValue(true)
+                forecastUiModel.postValue(ForecastUiModel.OnForecastLoading)
 
                 val response = weatherController.getFiveDaysForecast()
                 if (!response.isNullOrEmpty()) {

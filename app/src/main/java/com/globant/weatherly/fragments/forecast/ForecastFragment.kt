@@ -41,11 +41,9 @@ class ForecastFragment: Fragment() {
 
     @Composable
     fun ForecastScreen(viewModel: ForecastViewModel) {
-        val loading = viewModel.getShowLoading().observeAsState().value ?: false
-        if (loading) LoadingScreen()
-
         val uiModel = viewModel.getForecastUiModels().observeAsState().value
         when (uiModel) {
+            is ForecastUiModel.OnForecastLoading -> LoadingScreen()
             is ForecastUiModel.OnForeCastFiveDaysLoad -> ForecastList(uiModel.forecasts)
             is ForecastUiModel.OnForecastFiveDaysLoadError -> ErrorScreen()
             else -> { Unit }

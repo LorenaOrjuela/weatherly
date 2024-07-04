@@ -7,17 +7,18 @@ import java.time.format.DateTimeFormatter
 const val DATE_TIME = "yyyy-MM-dd HH:mm:ss"
 const val HOUR_AM_PM = "hh:mm a"
 const val DATE = "yyyy-MM-dd"
-const val DAY_MONTH_DAY = "EEEE, MMMM dd"
 
 fun now() = LocalDateTime.now()
 
-fun getDateTime(dateTime: LocalDateTime, pattern: String): String {
+fun getDatePattern(dateTime: LocalDateTime, pattern: String): String {
     val date = try {
         if (pattern.isNotEmpty()) {
             val formatter = DateTimeFormatter.ofPattern(pattern)
             dateTime.format(formatter)
         } else EMPTY
-    } catch (e: Exception) { "Invalid pattern" }
+    } catch (e: Exception) {
+        "Invalid pattern"
+    }
 
     return date.toString()
 }
@@ -35,7 +36,9 @@ fun getDate(dateTimeString: String, pattern: String): String {
                 val formatterDate = DateTimeFormatter.ofPattern(DATE)
                 date.format(formatterDate)
             } else EMPTY
-        } catch (e: Exception) { "Inputs are not coherent" }
+        } catch (e: Exception) {
+            "Inputs are not coherent"
+        }
 
     return dateFormatted.toString()
 }
@@ -52,23 +55,29 @@ fun getHourAmPm(dateTimeString: String, pattern: String): String {
             val formatterAmPm = DateTimeFormatter.ofPattern(HOUR_AM_PM)
             time.format(formatterAmPm)
         } else EMPTY
-    } catch (E: Exception) { "Inputs are not coherent" }
-
+    } catch (E: Exception) {
+        "Inputs are not coherent"
+    }
 
     return timeAmPm.toString()
 }
 
 fun getDateLetters(dateString: String, pattern: String): String {
 
-    val formatter = DateTimeFormatter.ofPattern(pattern)
-    val date = LocalDateTime.parse(dateString, formatter)
+    val dateLetters = try {
+        val formatter = DateTimeFormatter.ofPattern(pattern)
+        val date = LocalDateTime.parse(dateString, formatter)
 
-    val dayOfWeek = date.dayOfWeek.value
-    val month = date.month.value
-    val year = date.year
+        val dayOfWeek = date.dayOfWeek.value
+        val month = date.month.value
+        val day = date.dayOfMonth
 
-    return "${DayLetters.fromIndex(dayOfWeek).day}, " + "${MonthLetters.fromIndex(month).month} " + year.toString().takeLast(2)
+        "${DayLetters.fromIndex(dayOfWeek).day}, ${MonthLetters.fromIndex(month).month} $day"
+    } catch (e: Exception) {
+        "Inputs are not coherent"
+    }
 
+    return dateLetters
 }
 
 enum class DayLetters(val index: Int, val day: String) {
